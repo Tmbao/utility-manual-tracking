@@ -1,0 +1,16 @@
+{
+    "config": {
+        "error": {
+            "unknown_error": "Unexpected error"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "meter_name": "Meter name",
+                    "meter_unit": "Meter unit"
+                },
+                "description": "Enter your meter name (e.g. 'Gas Meter', 'Electric Meter') and unit (e.g. 'kWh', 'm³')."
+            }
+        }
+    }
+}

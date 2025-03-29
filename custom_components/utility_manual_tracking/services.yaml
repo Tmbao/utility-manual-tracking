@@ -1,0 +1,16 @@
+update_meter_value:
+  name: Update Meter Value
+  description: Update the value of a meter
+  target:
+    entity:
+      domain: sensor
+      integration: utility_manual_tracking
+  fields:
+    meter_id:
+      required: true
+      description: The entity ID of the sensor to update
+      example: sensor.my_meter_id
+    value:
+      required: true
+      description: The new value to set for the meter
+      example: 123.45
