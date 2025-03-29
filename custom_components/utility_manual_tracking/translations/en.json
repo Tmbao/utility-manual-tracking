@@ -7,7 +7,8 @@
             "user": {
                 "data": {
                     "meter_name": "Meter name",
-                    "meter_unit": "Meter unit"
+                    "meter_unit": "Meter unit",
+                    "meter_class": "Meter class"
                 },
                 "description": "Enter your meter name (e.g. 'Gas Meter', 'Electric Meter') and unit (e.g. 'kWh', 'm³')."
             }

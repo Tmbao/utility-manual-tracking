@@ -2,6 +2,7 @@
 
 from typing import Any
 from custom_components.utility_manual_tracking.consts import (
+    CONF_METER_CLASS,
     CONF_METER_NAME,
     CONF_METER_UNIT,
     DOMAIN,
@@ -20,6 +21,7 @@ class UtilityManualTrackingConfigFlow(ConfigFlow, domain=DOMAIN):
                     {
                         vol.Required(CONF_METER_NAME): str,
                         vol.Required(CONF_METER_UNIT): str,
+                        vol.Required(CONF_METER_CLASS): str,
                     }
                 ),
                 errors={},
@@ -30,5 +32,6 @@ class UtilityManualTrackingConfigFlow(ConfigFlow, domain=DOMAIN):
             data={
                 CONF_METER_NAME: user_input[CONF_METER_NAME],
                 CONF_METER_UNIT: user_input[CONF_METER_UNIT],
+                CONF_METER_CLASS: user_input[CONF_METER_CLASS],
             },
         )
