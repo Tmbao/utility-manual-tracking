@@ -12,8 +12,8 @@ class UtilityManualTrackingSensor(SensorEntity):
         self._meter_name = meter_name
         self._state: int = None
         self._last_updated = None
-        self.device_class = meter_class
-        self.unit_of_measurement = meter_unit
+        self._attr_device_class = meter_class
+        self._attr_unit_of_measurement = meter_unit
 
     def update(self, value) -> None:
         """Update the sensor state."""
