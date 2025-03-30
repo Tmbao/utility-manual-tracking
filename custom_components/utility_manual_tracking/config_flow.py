@@ -1,5 +1,7 @@
 """Config flow for Utility Manual Tracking."""
 
+from __future__ import annotations
+
 from typing import Any
 from custom_components.utility_manual_tracking.consts import (
     CONF_METER_CLASS,

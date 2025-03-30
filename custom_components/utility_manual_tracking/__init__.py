@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
@@ -22,7 +24,9 @@ async def async_setup_entry(
     """Set up the Utility Manual Tracking integration from a config entry."""
 
     sensor = UtilityManualTrackingSensor(
-        entry.data[CONF_METER_NAME], entry.data[CONF_METER_UNIT], entry.data[CONF_METER_CLASS]
+        entry.data[CONF_METER_NAME],
+        entry.data[CONF_METER_UNIT],
+        entry.data[CONF_METER_CLASS],
     )
     entry.runtime_data = [sensor]
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)

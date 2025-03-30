@@ -1,3 +1,7 @@
+"""Sensor for Utility Manual Tracking"""
+
+from __future__ import annotations
+
 import datetime
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.core import HomeAssistant
