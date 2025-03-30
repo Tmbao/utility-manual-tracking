@@ -15,12 +15,8 @@ from custom_components.utility_manual_tracking.sensors import (
     UtilityManualTrackingSensor,
 )
 
-type UtilityManualTrackingConfigEntry = ConfigEntry[UtilityManualTrackingSensor]
 
-
-async def async_setup_entry(
-    hass: HomeAssistant, entry: UtilityManualTrackingConfigEntry
-) -> bool:
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up the Utility Manual Tracking integration from a config entry."""
 
     sensor = UtilityManualTrackingSensor(
@@ -35,7 +31,7 @@ async def async_setup_entry(
 
 
 async def async_unload_entry(
-    hass: HomeAssistant, entry: UtilityManualTrackingConfigEntry
+    hass: HomeAssistant, entry: ConfigEntry
 ) -> bool:
     """Unload a config entry."""
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)

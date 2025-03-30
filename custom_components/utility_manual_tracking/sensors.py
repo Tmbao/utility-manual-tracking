@@ -5,8 +5,6 @@ from __future__ import annotations
 import datetime
 from homeassistant.components.sensor import SensorEntity
 
-from custom_components.utility_manual_tracking import UtilityManualTrackingConfigEntry
-
 
 class UtilityManualTrackingSensor(SensorEntity):
     def __init__(self, meter_name: str, meter_unit: str, meter_class: str) -> None:
