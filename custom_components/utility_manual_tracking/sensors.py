@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import datetime
 from homeassistant.components.sensor import SensorEntity
-from homeassistant.core import HomeAssistant
 
 from custom_components.utility_manual_tracking import UtilityManualTrackingConfigEntry
 
@@ -24,7 +23,7 @@ class UtilityManualTrackingSensor(SensorEntity):
         self._last_updated = datetime.datetime.now()
 
     @property
-    def extra_state_attributes(self) -> dict:
+    def extra_state_attributes(self) -> dict[str, any]:
         """Return the state attributes."""
         return {
             "meter_name": self._meter_name,

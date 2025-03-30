@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from homeassistant.core import ServiceCall
-from homeassistant.helpers.entity import SensorEntity
 from homeassistant.helpers import entity_registry
 
 from custom_components.utility_manual_tracking.sensors import (

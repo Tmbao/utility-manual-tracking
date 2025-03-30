@@ -1,11 +1,11 @@
 {
     "domain": "utility_manual_tracking",
     "name": "Utility Manual Tracking",
-    "iot_class": "assumed_state",
+    "iot_class": "local_polling",
     "documentation": "https://github.com/Tmbao/utility-manual-tracking/blob/master/README.md",
     "issue_tracker": "https://github.com/Tmbao/utility-manual-tracking/issues",
     "codeowners": ["@tmbao"],
     "loggers": ["utility_manual_tracking"],
-    "version": "1.0.0beta",
+    "version": "0.1",
     "config_flow": true
   }
