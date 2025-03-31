@@ -17,4 +17,4 @@ def handle_update_meter_value(call: ServiceCall):
     sensor = UtilityManualTrackingSensor(
         entity_registry.async_get_registry(call.hass).async_get(meter_id)
     )
-    sensor.update(value)
+    sensor.set_value(value)
