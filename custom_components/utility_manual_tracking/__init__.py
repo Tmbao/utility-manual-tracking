@@ -25,13 +25,6 @@ def setup(hass: HomeAssistant, config: dict):
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up the Utility Manual Tracking integration from a config entry."""
-
-    sensor = UtilityManualTrackingSensor(
-        entry.data[CONF_METER_NAME],
-        entry.data[CONF_METER_UNIT],
-        entry.data[CONF_METER_CLASS],
-    )
-    entry.runtime_data = sensor
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 
