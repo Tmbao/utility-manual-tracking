@@ -3,7 +3,7 @@ from __future__ import annotations
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from custom_components.utility_manual_tracking.actions import handle_update_meter_value
+from custom_components.utility_manual_tracking.action import handle_update_meter_value
 from custom_components.utility_manual_tracking.consts import (
     CONF_METER_CLASS,
     CONF_METER_NAME,
@@ -11,7 +11,7 @@ from custom_components.utility_manual_tracking.consts import (
     DOMAIN,
     PLATFORMS,
 )
-from custom_components.utility_manual_tracking.sensors import (
+from custom_components.utility_manual_tracking.sensor import (
     UtilityManualTrackingSensor,
 )
 

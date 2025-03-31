@@ -5,7 +5,7 @@ from __future__ import annotations
 from homeassistant.core import ServiceCall
 from homeassistant.helpers import entity_registry
 
-from custom_components.utility_manual_tracking.sensors import (
+from custom_components.utility_manual_tracking.sensor import (
     UtilityManualTrackingSensor,
 )
 
