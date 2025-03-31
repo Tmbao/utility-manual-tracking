@@ -26,7 +26,7 @@ async def async_setup_entry(
         entry.data[CONF_METER_UNIT],
         entry.data[CONF_METER_CLASS],
     )
-    entry.runtime_data = sensor
+    hass.data.get(DOMAIN)[sensor.unique_id] = sensor
 
     async_add_entities([sensor])
 

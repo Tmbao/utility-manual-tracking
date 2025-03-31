@@ -5,20 +5,14 @@ from homeassistant.core import HomeAssistant
 
 from custom_components.utility_manual_tracking.action import handle_update_meter_value
 from custom_components.utility_manual_tracking.consts import (
-    CONF_METER_CLASS,
-    CONF_METER_NAME,
-    CONF_METER_UNIT,
     DOMAIN,
     PLATFORMS,
-)
-from custom_components.utility_manual_tracking.sensor import (
-    UtilityManualTrackingSensor,
 )
 
 
 def setup(hass: HomeAssistant, config: dict):
     """Setup the Utility Manual Tracking integration."""
-    hass.data.setdefault(DOMAIN, [])
+    hass.data.setdefault(DOMAIN, {})
     hass.services.register(DOMAIN, "update_meter_value", handle_update_meter_value)
     return True
 
