@@ -8,13 +8,16 @@ from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
+from custom_components.utility_manual_tracking.algorithms import interpolate
 from custom_components.utility_manual_tracking.consts import (
+    CONF_ALGORITHM,
     CONF_METER_CLASS,
     CONF_METER_NAME,
     CONF_METER_UNIT,
     DOMAIN,
     LOGGER,
 )
+from custom_components.utility_manual_tracking.fitter import Datapoint
 
 
 async def async_setup_entry(
@@ -26,6 +29,7 @@ async def async_setup_entry(
         entry.data[CONF_METER_NAME],
         entry.data[CONF_METER_UNIT],
         entry.data[CONF_METER_CLASS],
+        entry.data[CONF_ALGORITHM],
     )
     hass.data.get(DOMAIN)[sensor.unique_id] = sensor
     LOGGER.info(
@@ -36,21 +40,45 @@ async def async_setup_entry(
 
 
 class UtilityManualTrackingSensor(SensorEntity):
-    def __init__(self, meter_name: str, meter_unit: str, meter_class: str) -> None:
+    MAX_PREVIOUS_READS = 10
+
+    def __init__(
+        self, meter_name: str, meter_unit: str, meter_class: str, algorithm: str | None
+    ) -> None:
         super().__init__()
         self._attr_unique_id = (
             f"{DOMAIN}_{meter_name.lower().replace(' ', '_')}_{meter_unit.lower()}"
         )
         self._attr_name = meter_name
         self._state: int = None
-        self._last_updated = None
         self._attr_device_class = meter_class
         self._attr_unit_of_measurement = meter_unit
+        self.entity_id = self._attr_unique_id
+
+        self._algorithm: str = algorithm
+        self._last_read: int = None
+        self._last_updated: datetime.datetime | None = None
+        self._previous_reads: list[Datapoint] = []
 
     def set_value(self, value) -> None:
         """Update the sensor state."""
+        if self._last_read is not None:
+            self._previous_reads.append(Datapoint(self._last_read, self._last_updated))
+            # Limit the number of previous reads to MAX_PREVIOUS_READS
+            self._previous_reads = self._previous_reads[-self.MAX_PREVIOUS_READS :]
+
         self._state = value
+        self._last_read = value
         self._last_updated = datetime.datetime.now()
+
+        missing_data = interpolate(
+            self._algorithm,
+            self._previous_reads,
+            Datapoint(self._state, self._last_updated),
+        )
+        LOGGER.debug(
+            f"Interpolating missing data with algorithm {self._algorithm}: {missing_data}"
+        )
 
     @property
     def extra_state_attributes(self) -> dict[str, any]:
@@ -58,6 +86,8 @@ class UtilityManualTrackingSensor(SensorEntity):
         return {
             "meter_name": self._attr_name,
             "last_updated": self._last_updated,
+            "previous_reads": self._previous_reads,
+            "algorithm": self._algorithm,
         }
 
     @property

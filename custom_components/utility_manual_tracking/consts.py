@@ -9,6 +9,7 @@ DOMAIN = "utility_manual_tracking"
 CONF_METER_NAME = "meter_name"
 CONF_METER_UNIT = "meter_unit"
 CONF_METER_CLASS = "meter_class"
+CONF_ALGORITHM = "algorithm"
 
 ATTRIBUTION = "Data provided by Amber Electric"
 

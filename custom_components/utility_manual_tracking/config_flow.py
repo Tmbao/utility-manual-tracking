@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 from custom_components.utility_manual_tracking.consts import (
+    CONF_ALGORITHM,
     CONF_METER_CLASS,
     CONF_METER_NAME,
     CONF_METER_UNIT,
@@ -24,6 +25,7 @@ class UtilityManualTrackingConfigFlow(ConfigFlow, domain=DOMAIN):
                         vol.Required(CONF_METER_NAME): str,
                         vol.Required(CONF_METER_UNIT): str,
                         vol.Required(CONF_METER_CLASS): str,
+                        vol.Optional(CONF_ALGORITHM): str,
                     }
                 ),
                 errors={},
@@ -35,5 +37,6 @@ class UtilityManualTrackingConfigFlow(ConfigFlow, domain=DOMAIN):
                 CONF_METER_NAME: user_input[CONF_METER_NAME],
                 CONF_METER_UNIT: user_input[CONF_METER_UNIT],
                 CONF_METER_CLASS: user_input[CONF_METER_CLASS],
+                CONF_ALGORITHM: user_input[CONF_ALGORITHM],
             },
         )
