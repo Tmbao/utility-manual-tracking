@@ -13,6 +13,7 @@ from custom_components.utility_manual_tracking.consts import (
     CONF_METER_NAME,
     CONF_METER_UNIT,
     DOMAIN,
+    LOGGER,
 )
 
 
@@ -27,6 +28,9 @@ async def async_setup_entry(
         entry.data[CONF_METER_CLASS],
     )
     hass.data.get(DOMAIN)[sensor.unique_id] = sensor
+    LOGGER.info(
+        f"Setting up Utility Manual Tracking sensor: {sensor.unique_id} with name {sensor.name}"
+    )
 
     async_add_entities([sensor])
 
