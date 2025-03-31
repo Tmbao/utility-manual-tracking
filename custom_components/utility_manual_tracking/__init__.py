@@ -16,6 +16,13 @@ from custom_components.utility_manual_tracking.sensors import (
 )
 
 
+async def async_setup(hass: HomeAssistant, config: dict):
+    """Setup the Utility Manual Tracking integration."""
+    hass.data.setdefault(DOMAIN, [])
+    hass.services.register(DOMAIN, "update_meter_value", handle_update_meter_value)
+    return True
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up the Utility Manual Tracking integration from a config entry."""
 
@@ -24,14 +31,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         entry.data[CONF_METER_UNIT],
         entry.data[CONF_METER_CLASS],
     )
-    entry.runtime_data = [sensor]
+    entry.runtime_data = sensor
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
-    hass.services.register(DOMAIN, "update_meter_value", handle_update_meter_value)
     return True
 
 
-async def async_unload_entry(
-    hass: HomeAssistant, entry: ConfigEntry
-) -> bool:
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)

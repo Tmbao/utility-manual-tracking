@@ -10,7 +10,7 @@
                     "meter_unit": "Meter unit",
                     "meter_class": "Meter class"
                 },
-                "description": "Enter your meter name (e.g. 'Gas Meter', 'Electric Meter') and unit (e.g. 'kWh', 'm³')."
+                "description": "Enter your meter name (e.g. 'Gas Meter', 'Electric Meter'); unit (e.g. 'kWh', 'm³') and class (e.g. 'energy')."
             }
         }
     }
