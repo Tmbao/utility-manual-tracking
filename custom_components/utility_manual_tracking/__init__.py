@@ -16,7 +16,7 @@ from custom_components.utility_manual_tracking.sensors import (
 )
 
 
-async def async_setup(hass: HomeAssistant, config: dict):
+def setup(hass: HomeAssistant, config: dict):
     """Setup the Utility Manual Tracking integration."""
     hass.data.setdefault(DOMAIN, [])
     hass.services.register(DOMAIN, "update_meter_value", handle_update_meter_value)
