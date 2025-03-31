@@ -6,10 +6,6 @@ update_meter_value:
       domain: sensor
       integration: utility_manual_tracking
   fields:
-    meter_id:
-      required: true
-      description: The entity ID of the sensor to update
-      example: sensor.my_meter_id
     value:
       required: true
       description: The new value to set for the meter

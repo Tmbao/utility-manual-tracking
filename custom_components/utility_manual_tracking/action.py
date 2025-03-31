@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from homeassistant.core import ServiceCall
-from homeassistant.helpers import entity_registry
+from homeassistant.helpers import entity_registry, service
 
 from custom_components.utility_manual_tracking.sensor import (
     UtilityManualTrackingSensor,
@@ -11,10 +11,9 @@ from custom_components.utility_manual_tracking.sensor import (
 
 
 def handle_update_meter_value(call: ServiceCall):
-    meter_id = call.data.get("meter_id")
+    entities = service.async_extract_referenced_entity_ids(call.hass, call)
     value = call.data.get("value")
-
-    sensor = UtilityManualTrackingSensor(
-        entity_registry.async_get_registry(call.hass).async_get(meter_id)
-    )
-    sensor.set_value(value)
+    for sensor_id in entities.referenced:
+        sensor = entity_registry.async_get(call.hass).async_get(sensor_id)
+        if isinstance(sensor, UtilityManualTrackingSensor):
+            sensor.set_value(value)
