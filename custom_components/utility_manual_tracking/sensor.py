@@ -8,7 +8,10 @@ from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from custom_components.utility_manual_tracking.algorithms import interpolate
+from custom_components.utility_manual_tracking.algorithms import (
+    extrapolate,
+    interpolate,
+)
 from custom_components.utility_manual_tracking.consts import (
     CONF_ALGORITHM,
     CONF_METER_CLASS,
@@ -18,6 +21,7 @@ from custom_components.utility_manual_tracking.consts import (
     LOGGER,
 )
 from custom_components.utility_manual_tracking.fitter import Datapoint
+from custom_components.utility_manual_tracking.statistics import backfill_statistics
 
 
 async def async_setup_entry(
@@ -50,13 +54,13 @@ class UtilityManualTrackingSensor(SensorEntity):
             f"{DOMAIN}_{meter_name.lower().replace(' ', '_')}_{meter_unit.lower()}"
         )
         self._attr_name = meter_name
-        self._state: int = None
+        self._state: float = None
         self._attr_device_class = meter_class
         self._attr_unit_of_measurement = meter_unit
         self.entity_id = self._attr_unique_id
 
         self._algorithm: str = algorithm
-        self._last_read: int = None
+        self._last_read: float = None
         self._last_updated: datetime.datetime | None = None
         self._previous_reads: list[Datapoint] = []
 
@@ -80,6 +84,15 @@ class UtilityManualTrackingSensor(SensorEntity):
             f"Interpolating missing data with algorithm {self._algorithm}: {missing_data}"
         )
 
+        backfill_statistics(
+            self.hass,
+            self.entity_id,
+            self._attr_name,
+            self._attr_unit_of_measurement,
+            self._algorithm,
+            missing_data + [Datapoint(self._state, self._last_updated)],
+        )
+
     @property
     def extra_state_attributes(self) -> dict[str, any]:
         """Return the state attributes."""
@@ -91,6 +104,8 @@ class UtilityManualTrackingSensor(SensorEntity):
         }
 
     @property
-    def native_value(self) -> int:
+    def native_value(self) -> float | None:
         """Return the state of the sensor."""
-        return self._state
+        return extrapolate(
+            self._algorithm, self._previous_reads, datetime.datetime.now()
+        ).value

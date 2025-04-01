@@ -31,7 +31,7 @@ class LinearInterpolate(Interpolate):
         missing_timestamp = latest_old_datapoint.timestamp + GRANULAR_DELTA
         missing_value = latest_old_datapoint.value + slope
         while missing_timestamp < new_datapoint.timestamp:
-            missing_value.append(Datapoint(missing_value, missing_timestamp))
+            missing_datapoints.append(Datapoint(missing_value, missing_timestamp))
             missing_timestamp += GRANULAR_DELTA
             missing_value += slope
         return missing_datapoints
@@ -47,7 +47,7 @@ class LinearExtrapolate(Extrapolate):
             return None
 
         if len(datapoints) == 1:
-            return datapoints[0]
+            return Datapoint(datapoints[0].value, now)
 
         latest_datapoint = datapoints[-1]
         second_latest_datapoint = datapoints[-2]
@@ -57,7 +57,8 @@ class LinearExtrapolate(Extrapolate):
         difference = latest_datapoint.value - second_latest_datapoint.value
         slope = difference / difference_secs
 
-        return (
+        return Datapoint(
             latest_datapoint.value
-            + slope * (now - latest_datapoint.timestamp).total_seconds()
+            + slope * (now - latest_datapoint.timestamp).total_seconds(),
+            now,
         )
