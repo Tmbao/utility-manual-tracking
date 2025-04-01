@@ -35,9 +35,9 @@ async def async_setup_entry(
         entry.data[CONF_METER_CLASS],
         entry.data[CONF_ALGORITHM],
     )
-    hass.data.get(DOMAIN)[sensor.unique_id] = sensor
+    hass.data.get(DOMAIN)[sensor.entity_id] = sensor
     LOGGER.info(
-        f"Setting up Utility Manual Tracking sensor: {sensor.unique_id} with name {sensor.name}"
+        f"Setting up Utility Manual Tracking sensor: {sensor.entity_id} with name {sensor.name}"
     )
 
     async_add_entities([sensor])
@@ -57,7 +57,7 @@ class UtilityManualTrackingSensor(SensorEntity):
         self._state: float = None
         self._attr_device_class = meter_class
         self._attr_unit_of_measurement = meter_unit
-        self.entity_id = self._attr_unique_id
+        self.entity_id = f"sensor.{self._attr_unique_id}"
 
         self._algorithm: str = algorithm
         self._last_read: float = None
