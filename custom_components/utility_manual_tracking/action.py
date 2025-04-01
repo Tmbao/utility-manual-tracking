@@ -15,7 +15,7 @@ def handle_update_meter_value(call: ServiceCall):
     entities = service.async_extract_referenced_entity_ids(call.hass, call)
     value = call.data.get("value")
     for sensor_id in entities.referenced:
-        sensor = call.hass.data.get(DOMAIN)[sensor_id[len("sensor.") :]]
+        sensor = call.hass.data.get(DOMAIN)[sensor_id]
         if isinstance(sensor, UtilityManualTrackingSensor):
             sensor.set_value(value)
             LOGGER.info(f"Updated sensor {sensor_id} with value {value}")
