@@ -84,13 +84,15 @@ class UtilityManualTrackingSensor(SensorEntity):
             f"Interpolating missing data with algorithm {self._algorithm}: {missing_data}"
         )
 
-        backfill_statistics(
-            self.hass,
-            self.entity_id,
-            self._attr_name,
-            self._attr_unit_of_measurement,
-            self._algorithm,
-            missing_data + [Datapoint(self._state, self._last_updated)],
+        self.hass.async_create_task(
+            backfill_statistics(
+                self.hass,
+                self.entity_id,
+                self._attr_name,
+                self._attr_unit_of_measurement,
+                self._algorithm,
+                missing_data + [Datapoint(self._state, self._last_updated)],
+            )
         )
 
     @property
