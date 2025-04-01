@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import datetime
+from datetime import datetime, timezone
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
@@ -61,7 +61,7 @@ class UtilityManualTrackingSensor(SensorEntity):
 
         self._algorithm: str = algorithm
         self._last_read: float = None
-        self._last_updated: datetime.datetime | None = None
+        self._last_updated: datetime | None = None
         self._previous_reads: list[Datapoint] = []
 
     def set_value(self, value) -> None:
@@ -73,7 +73,7 @@ class UtilityManualTrackingSensor(SensorEntity):
 
         self._state = value
         self._last_read = value
-        self._last_updated = datetime.datetime.now()
+        self._last_updated = datetime.now(timezone.utc)
 
         missing_data = interpolate(
             self._algorithm,
@@ -106,6 +106,9 @@ class UtilityManualTrackingSensor(SensorEntity):
     @property
     def native_value(self) -> float | None:
         """Return the state of the sensor."""
-        return extrapolate(
-            self._algorithm, self._previous_reads, datetime.datetime.now()
-        ).value
+        latest_datapoint = extrapolate(
+            self._algorithm, self._previous_reads, datetime.now(timezone.utc)
+        )
+        if latest_datapoint is not None:
+            return latest_datapoint.value
+        return None
