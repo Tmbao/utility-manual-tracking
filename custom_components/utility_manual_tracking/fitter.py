@@ -5,10 +5,9 @@ This is used for interpolation and extrapolation of data points.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-import dataclasses
 import datetime
 
-from dataclasses import dataclass
+from pydantic import dataclass
 
 GRANULAR_DELTA = datetime.timedelta(hours=1)
 
@@ -19,9 +18,6 @@ class Datapoint:
 
     value: float
     timestamp: datetime.datetime
-
-    def to_dict(self) -> dict:
-        return dataclasses.asdict(self)
 
 
 class Interpolate(ABC):
