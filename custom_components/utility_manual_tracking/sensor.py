@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import asyncio
+
 from datetime import datetime, timezone
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.core import HomeAssistant
@@ -80,11 +82,18 @@ class UtilityManualTrackingSensor(SensorEntity):
             self._previous_reads,
             Datapoint(self._state, self._last_updated),
         )
+
         LOGGER.debug(
             f"Interpolating missing data with algorithm {self._algorithm}: {missing_data}"
         )
 
-        self.hass.async_create_task(
+        # Backfill statistics with the new data
+        # This is a blocking call, so we need to run it in the event loop
+        # using run_coroutine_threadsafe
+        LOGGER.debug(
+            f"Backfilling statistics for {self.entity_id} with algorithm {self._algorithm}"
+        )
+        asyncio.run_coroutine_threadsafe(
             backfill_statistics(
                 self.hass,
                 self.entity_id,
@@ -92,7 +101,11 @@ class UtilityManualTrackingSensor(SensorEntity):
                 self._attr_unit_of_measurement,
                 self._algorithm,
                 missing_data + [Datapoint(self._state, self._last_updated)],
-            )
+            ),
+            self.hass.loop,
+        ).result()
+        LOGGER.debug(
+            f"Backfilled statistics for {self.entity_id} with algorithm {self._algorithm}"
         )
 
     @property
