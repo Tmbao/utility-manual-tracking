@@ -96,7 +96,7 @@ class UtilityManualTrackingSensor(SensorEntity):
         asyncio.run_coroutine_threadsafe(
             backfill_statistics(
                 self.hass,
-                self.entity_id,
+                self.unique_id,
                 self._attr_name,
                 self._attr_unit_of_measurement,
                 self._algorithm,
@@ -114,7 +114,7 @@ class UtilityManualTrackingSensor(SensorEntity):
         return {
             "meter_name": self._attr_name,
             "last_updated": self._last_updated,
-            "previous_reads": self._previous_reads,
+            "previous_reads": map(lambda read: read.to_dict(), self._previous_reads),
             "algorithm": self._algorithm,
         }
 
