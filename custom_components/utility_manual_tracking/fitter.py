@@ -7,12 +7,12 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 import datetime
 
-from pydantic import dataclass
+from attrs import frozen
 
 GRANULAR_DELTA = datetime.timedelta(hours=1)
 
 
-@dataclass
+@frozen
 class Datapoint:
     """Datapoint class."""
 

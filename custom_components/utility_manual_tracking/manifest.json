@@ -10,9 +10,6 @@
   "loggers": [
     "utility_manual_tracking"
   ],
-  "requirements": [
-    "pydantic==2.11.1"
-  ],
   "version": "0.1",
   "config_flow": true
 }
