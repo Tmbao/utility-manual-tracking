@@ -3,7 +3,7 @@
 from __future__ import annotations
 import datetime
 
-from attr import dataclass
+from dataclasses import dataclass
 
 from custom_components.utility_manual_tracking.fitter import (
     Datapoint,
@@ -16,7 +16,7 @@ from custom_components.utility_manual_tracking.linear_fitter import (
 )
 
 
-@dataclass
+@dataclass(frozen=True)
 class Algorithm:
     """Algorithm class."""
 

@@ -5,19 +5,33 @@ This is used for interpolation and extrapolation of data points.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 import datetime
-
-from attrs import frozen
 
 GRANULAR_DELTA = datetime.timedelta(hours=1)
 
 
-@frozen
+@dataclass(frozen=True)
 class Datapoint:
     """Datapoint class."""
 
     value: float
     timestamp: datetime.datetime
+
+    def as_dict(self) -> dict[str, float | str]:
+        """Convert to dict."""
+        return {
+            "value": self.value,
+            "timestamp": self.timestamp.isoformat(),
+        }
+    
+    @staticmethod
+    def from_dict(data: dict[str, float | str]) -> Datapoint:
+        """Convert from dict."""
+        return Datapoint(
+            value=data["value"],
+            timestamp=datetime.datetime.fromisoformat(data["timestamp"]),
+        )
 
 
 class Interpolate(ABC):

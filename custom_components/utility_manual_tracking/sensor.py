@@ -64,12 +64,14 @@ class UtilityManualTrackingSensor(SensorEntity):
         self._algorithm: str = algorithm
         self._last_read: float = None
         self._last_updated: datetime | None = None
-        self._previous_reads: list[Datapoint] = []
+        self._previous_reads: list[dict[str, float | str]] = []
 
     def set_value(self, value) -> None:
         """Update the sensor state."""
         if self._last_read is not None:
-            self._previous_reads.append(Datapoint(self._last_read, self._last_updated))
+            self._previous_reads.append(
+                Datapoint(self._last_read, self._last_updated).as_dict()
+            )
             # Limit the number of previous reads to MAX_PREVIOUS_READS
             self._previous_reads = self._previous_reads[-self.MAX_PREVIOUS_READS :]
 
@@ -79,7 +81,7 @@ class UtilityManualTrackingSensor(SensorEntity):
 
         missing_data = interpolate(
             self._algorithm,
-            self._previous_reads,
+            [Datapoint.from_dict(read) for read in self._previous_reads],
             Datapoint(self._state, self._last_updated),
         )
 
@@ -114,7 +116,7 @@ class UtilityManualTrackingSensor(SensorEntity):
         return {
             "meter_name": self._attr_name,
             "last_updated": self._last_updated,
-            "previous_reads": map(lambda read: read.to_dict(), self._previous_reads),
+            "previous_reads": self._previous_reads,
             "algorithm": self._algorithm,
         }
 
@@ -122,7 +124,9 @@ class UtilityManualTrackingSensor(SensorEntity):
     def native_value(self) -> float | None:
         """Return the state of the sensor."""
         latest_datapoint = extrapolate(
-            self._algorithm, self._previous_reads, datetime.now(timezone.utc)
+            self._algorithm,
+            [Datapoint.from_dict(read) for read in self._previous_reads],
+            datetime.now(timezone.utc),
         )
         if latest_datapoint is not None:
             return latest_datapoint.value
