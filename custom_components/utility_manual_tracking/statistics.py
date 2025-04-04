@@ -15,7 +15,7 @@ async def backfill_statistics(
     datapoints: list[Datapoint],
 ) -> None:
 
-    statistics_id: str = f"{sensor_id}_statistics_{algorithm}"
+    statistics_id: str = f"{DOMAIN}:{sensor_id}_statistics_{algorithm}"
     metadata = StatisticMetaData(
         has_mean=False,
         has_sum=True,

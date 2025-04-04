@@ -12,6 +12,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from custom_components.utility_manual_tracking.algorithms import (
+    DEFAULT_ALGORITHM,
     extrapolate,
     interpolate,
 )
@@ -62,7 +63,7 @@ class UtilityManualTrackingSensor(SensorEntity):
         self._attr_unit_of_measurement = meter_unit
         self.entity_id = f"sensor.{self._attr_unique_id}"
 
-        self._algorithm: str = algorithm
+        self._algorithm: str = algorithm.lower() if algorithm else DEFAULT_ALGORITHM
         self._last_read: float = None
         self._last_updated: datetime | None = None
         self._previous_reads: list[dict[str, float | str]] = []
