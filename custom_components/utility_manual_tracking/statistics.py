@@ -2,7 +2,7 @@ from homeassistant.components.recorder.models import StatisticMetaData, Statisti
 from homeassistant.components.recorder.statistics import async_add_external_statistics
 from homeassistant.core import HomeAssistant
 
-from custom_components.utility_manual_tracking.consts import DOMAIN
+from custom_components.utility_manual_tracking.consts import DOMAIN, LOGGER
 from custom_components.utility_manual_tracking.fitter import Datapoint
 
 
@@ -15,12 +15,13 @@ async def backfill_statistics(
     datapoints: list[Datapoint],
 ) -> None:
 
+    statistics_id: str = f"{sensor_id}_statistics_{algorithm}"
     metadata = StatisticMetaData(
         has_mean=False,
         has_sum=True,
         name=f"{meter_name} - statistics ({algorithm})",
         source=DOMAIN,
-        statistic_id=f"{sensor_id}_statistics_{algorithm}",
+        statistic_id=statistics_id,
         unit_of_measurement=meter_unit,
     )
 
@@ -33,4 +34,5 @@ async def backfill_statistics(
             )
         )
 
+    LOGGER.debug(f"Writing statistics {statistics_id}: {len(statistics)} datapoints")
     async_add_external_statistics(hass, metadata, statistics)
