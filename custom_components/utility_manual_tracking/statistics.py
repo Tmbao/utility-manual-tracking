@@ -27,10 +27,11 @@ async def backfill_statistics(
 
     statistics: list[StatisticData] = []
     for datapoint in datapoints:
+        start_timestamp = datapoint.timestamp.replace(minute=0, second=0, microsecond=0)
         statistics.append(
             StatisticData(
                 sum=datapoint.value,
-                start=datapoint.timestamp,
+                start=start_timestamp,
             )
         )
 
