@@ -6,7 +6,7 @@ import asyncio
 
 from datetime import datetime, timezone
 import json
-from homeassistant.components.sensor import SensorEntity
+from homeassistant.components.sensor import SensorEntity, SensorStateClass
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -58,33 +58,32 @@ class UtilityManualTrackingSensor(SensorEntity):
             f"{DOMAIN}_{meter_name.lower().replace(' ', '_')}_{meter_unit.lower()}"
         )
         self._attr_name = meter_name
-        self._state: float = None
         self._attr_device_class = meter_class
         self._attr_unit_of_measurement = meter_unit
+        self._attr_state_class = SensorStateClass.TOTAL
         self.entity_id = f"sensor.{self._attr_unique_id}"
 
         self._algorithm: str = algorithm.lower() if algorithm else DEFAULT_ALGORITHM
-        self._last_read: float = None
+        self._last_read_value: float = None
         self._last_updated: datetime | None = None
         self._previous_reads: list[dict[str, float | str]] = []
 
     def set_value(self, value) -> None:
         """Update the sensor state."""
-        if self._last_read is not None:
+        if self._last_read_value:
             self._previous_reads.append(
-                Datapoint(self._last_read, self._last_updated).as_dict()
+                Datapoint(self._last_read_value, self._last_updated).as_dict()
             )
             # Limit the number of previous reads to MAX_PREVIOUS_READS
             self._previous_reads = self._previous_reads[-self.MAX_PREVIOUS_READS :]
 
-        self._state = value
-        self._last_read = value
+        self._last_read_value = value
         self._last_updated = datetime.now(timezone.utc)
 
         missing_data = interpolate(
             self._algorithm,
             [Datapoint.from_dict(read) for read in self._previous_reads],
-            Datapoint(self._state, self._last_updated),
+            Datapoint(self._last_read_value, self._last_updated),
         )
 
         LOGGER.debug(
@@ -101,7 +100,7 @@ class UtilityManualTrackingSensor(SensorEntity):
                 self._attr_name,
                 self._attr_unit_of_measurement,
                 self._algorithm,
-                missing_data + [Datapoint(self._state, self._last_updated)],
+                missing_data + [Datapoint(self._last_read_value, self._last_updated)],
             ),
             self.hass.loop,
         ).result()
@@ -115,6 +114,7 @@ class UtilityManualTrackingSensor(SensorEntity):
         return {
             "meter_name": self._attr_name,
             "last_updated": self._last_updated,
+            "last_read": self._last_read_value,
             "previous_reads": json.dumps(self._previous_reads),
             "algorithm": self._algorithm,
         }
@@ -124,9 +124,10 @@ class UtilityManualTrackingSensor(SensorEntity):
         """Return the state of the sensor."""
         latest_datapoint = extrapolate(
             self._algorithm,
-            [Datapoint.from_dict(read) for read in self._previous_reads],
+            [Datapoint.from_dict(read) for read in self._previous_reads]
+            + [Datapoint(self._last_read_value, self._last_updated)],
             datetime.now(timezone.utc),
         )
-        if latest_datapoint is not None:
+        if latest_datapoint:
             return latest_datapoint.value
         return None

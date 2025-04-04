@@ -17,7 +17,7 @@ from homeassistant.config_entries import ConfigFlow
 
 class UtilityManualTrackingConfigFlow(ConfigFlow, domain=DOMAIN):
     async def async_step_user(self, user_input: dict[str, Any] | None = None):
-        if user_input is None:
+        if not user_input:
             return self.async_show_form(
                 step_id="user",
                 data_schema=vol.Schema(
