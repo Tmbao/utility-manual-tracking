@@ -68,6 +68,8 @@ class UtilityManualTrackingSensor(SensorEntity):
         self._last_updated: datetime | None = None
         self._previous_reads: list[dict[str, float | str]] = []
 
+        self._load_attributes()
+
     def set_value(self, value, date_utc) -> None:
         """Update the sensor state."""
         if self._last_read_value:
@@ -112,6 +114,8 @@ class UtilityManualTrackingSensor(SensorEntity):
         LOGGER.debug(
             f"Backfilled statistics for {self.entity_id} with algorithm {self._algorithm}"
         )
+        LOGGER.debug("Persisting attributes to storage")
+        self._save_attributes()
 
     @property
     def extra_state_attributes(self) -> dict[str, any]:
@@ -136,3 +140,16 @@ class UtilityManualTrackingSensor(SensorEntity):
         if latest_datapoint:
             return latest_datapoint.value
         return None
+
+    def _save_attributes(self) -> None:
+        attributes = self.extra_state_attributes()
+        self.hass.data[DOMAIN][self.entity_id + "_attributes"] = attributes
+
+    def _load_attributes(self) -> None:
+        attributes = self.hass.data[DOMAIN].get(self.entity_id + "_attributes")
+        if attributes:
+            LOGGER.debug("Loading attributes from storage")
+            self._last_updated = attributes.get("last_updated")
+            self._last_read_value = attributes.get("last_read")
+            self._previous_reads = json.loads(attributes.get("previous_reads"))
+            self._algorithm = attributes.get("algorithm")
