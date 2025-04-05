@@ -59,7 +59,7 @@ class UtilityManualTrackingSensor(SensorEntity):
         )
         self._attr_name = meter_name
         self._attr_device_class = meter_class
-        self._attr_unit_of_measurement = meter_unit
+        self._attr_native_unit_of_measurement = meter_unit
         self._attr_state_class = SensorStateClass.TOTAL
         self.entity_id = f"sensor.{self._attr_unique_id}"
 
