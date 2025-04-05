@@ -55,7 +55,7 @@ class UtilityManualTrackingSensor(SensorEntity):
     ) -> None:
         super().__init__()
         self._attr_unique_id = (
-            f"{DOMAIN}_{meter_name.lower().replace(' ', '_')}_{meter_unit.lower()}"
+            f"{DOMAIN}_{meter_name.lower().replace(' ', '_')}_{meter_class.lower()}"
         )
         self._attr_name = meter_name
         self._attr_device_class = meter_class
