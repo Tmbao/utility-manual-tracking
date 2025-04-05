@@ -148,7 +148,7 @@ class UtilityManualTrackingSensor(SensorEntity):
         return None
 
     def _save_attributes(self) -> None:
-        attributes = self.extra_state_attributes()
+        attributes = self.extra_state_attributes
         self.hass.data[DOMAIN][self.entity_id + "_attributes"] = attributes
 
     def _load_attributes(self, hass: HomeAssistant) -> None:
