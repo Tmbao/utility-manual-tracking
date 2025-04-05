@@ -111,7 +111,7 @@ class UtilityManualTrackingSensor(SensorEntity):
                 self.hass,
                 self.unique_id,
                 self._attr_name,
-                self._attr_unit_of_measurement,
+                self._attr_native_unit_of_measurement,
                 self._algorithm,
                 missing_data + [Datapoint(self._last_read_value, self._last_updated)],
             ),
