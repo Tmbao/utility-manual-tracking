@@ -71,6 +71,11 @@ class UtilityManualTrackingSensor(SensorEntity):
     def set_value(self, value, date_utc) -> None:
         """Update the sensor state."""
         if self._last_read_value:
+            if self._last_updated >= date_utc:
+                raise ValueError(
+                    f"New reading {date_utc} cannot be earlier than the last read {self._last_updated}"
+                )
+
             self._previous_reads.append(
                 Datapoint(self._last_read_value, self._last_updated).as_dict()
             )
