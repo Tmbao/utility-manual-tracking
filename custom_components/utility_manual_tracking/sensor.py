@@ -34,6 +34,7 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     sensor = UtilityManualTrackingSensor(
+        hass,
         entry.data[CONF_METER_NAME],
         entry.data[CONF_METER_UNIT],
         entry.data[CONF_METER_CLASS],
@@ -51,7 +52,12 @@ class UtilityManualTrackingSensor(SensorEntity):
     MAX_PREVIOUS_READS = 10
 
     def __init__(
-        self, meter_name: str, meter_unit: str, meter_class: str, algorithm: str | None
+        self,
+        hass: HomeAssistant,
+        meter_name: str,
+        meter_unit: str,
+        meter_class: str,
+        algorithm: str | None,
     ) -> None:
         super().__init__()
         self._attr_unique_id = (
@@ -68,7 +74,7 @@ class UtilityManualTrackingSensor(SensorEntity):
         self._last_updated: datetime | None = None
         self._previous_reads: list[dict[str, float | str]] = []
 
-        self._load_attributes()
+        self._load_attributes(hass)
 
     def set_value(self, value, date_utc) -> None:
         """Update the sensor state."""
@@ -145,8 +151,8 @@ class UtilityManualTrackingSensor(SensorEntity):
         attributes = self.extra_state_attributes()
         self.hass.data[DOMAIN][self.entity_id + "_attributes"] = attributes
 
-    def _load_attributes(self) -> None:
-        attributes = self.hass.data[DOMAIN].get(self.entity_id + "_attributes")
+    def _load_attributes(self, hass: HomeAssistant) -> None:
+        attributes = hass.data[DOMAIN].get(self.entity_id + "_attributes")
         if attributes:
             LOGGER.debug("Loading attributes from storage")
             self._last_updated = attributes.get("last_updated")
