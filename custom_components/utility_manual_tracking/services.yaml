@@ -10,3 +10,7 @@ update_meter_value:
       required: true
       description: The new value to set for the meter
       example: 123.45
+    date:
+      required: false
+      description: The date to that the meter was read (optional). The format should be YYYY-mm-dd HH.
+      example: 2023-10-01 11

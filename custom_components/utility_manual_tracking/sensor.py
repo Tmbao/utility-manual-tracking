@@ -68,7 +68,7 @@ class UtilityManualTrackingSensor(SensorEntity):
         self._last_updated: datetime | None = None
         self._previous_reads: list[dict[str, float | str]] = []
 
-    def set_value(self, value) -> None:
+    def set_value(self, value, date_utc) -> None:
         """Update the sensor state."""
         if self._last_read_value:
             self._previous_reads.append(
@@ -78,7 +78,7 @@ class UtilityManualTrackingSensor(SensorEntity):
             self._previous_reads = self._previous_reads[-self.MAX_PREVIOUS_READS :]
 
         self._last_read_value = value
-        self._last_updated = datetime.now(timezone.utc)
+        self._last_updated = date_utc
 
         missing_data = interpolate(
             self._algorithm,
