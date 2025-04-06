@@ -33,3 +33,17 @@ def handle_update_meter_value(call: ServiceCall):
             LOGGER.error(
                 f"Entity {sensor_id} is not a UtilityManualTrackingSensor, unable to update value."
             )
+
+
+def handle_reset_meter_statistics(call: ServiceCall):
+    """Handle the reset_meter_statistics service call."""
+    entities = service.async_extract_referenced_entity_ids(call.hass, call)
+    for sensor_id in entities.referenced:
+        sensor = call.hass.data.get(DOMAIN)[sensor_id]
+        if isinstance(sensor, UtilityManualTrackingSensor):
+            sensor.reset_statistics()
+            LOGGER.info(f"Reset statistics for sensor {sensor_id}")
+        else:
+            LOGGER.error(
+                f"Entity {sensor_id} is not a UtilityManualTrackingSensor, unable to reset statistics."
+            )

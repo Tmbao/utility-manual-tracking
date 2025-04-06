@@ -1,5 +1,8 @@
 from homeassistant.components.recorder.models import StatisticMetaData, StatisticData
-from homeassistant.components.recorder.statistics import async_add_external_statistics
+from homeassistant.components.recorder.statistics import (
+    async_add_external_statistics,
+    clear_statistics,
+)
 from homeassistant.core import HomeAssistant
 
 from custom_components.utility_manual_tracking.consts import DOMAIN, LOGGER
@@ -14,8 +17,7 @@ async def backfill_statistics(
     algorithm: str,
     datapoints: list[Datapoint],
 ) -> None:
-
-    statistics_id: str = f"{DOMAIN}:{sensor_id}_statistics_{algorithm}"
+    statistics_id: str = get_statistics_id(sensor_id, algorithm)
     metadata = StatisticMetaData(
         has_mean=False,
         has_sum=True,
@@ -37,3 +39,19 @@ async def backfill_statistics(
 
     LOGGER.debug(f"Writing statistics {statistics_id}: {len(statistics)} datapoints")
     async_add_external_statistics(hass, metadata, statistics)
+
+
+def get_statistics_id(sensor_id: str, algorithm: str) -> str:
+    """Get the statistics ID for a sensor."""
+    return f"{DOMAIN}:{sensor_id}_statistics_{algorithm}"
+
+
+def reset_statistics(
+    hass: HomeAssistant,
+    sensor_id: str,
+    algorithm: str,
+) -> None:
+    """Clear statistics for a sensor."""
+    statistics_id = get_statistics_id(sensor_id, algorithm)
+    LOGGER.debug(f"Clearing statistics {statistics_id}")
+    clear_statistics(hass, statistics_id)

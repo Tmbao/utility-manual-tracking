@@ -25,7 +25,10 @@ from custom_components.utility_manual_tracking.consts import (
     LOGGER,
 )
 from custom_components.utility_manual_tracking.fitter import Datapoint
-from custom_components.utility_manual_tracking.statistics import backfill_statistics
+from custom_components.utility_manual_tracking.statistics import (
+    backfill_statistics,
+    reset_statistics,
+)
 
 
 async def async_setup_entry(
@@ -122,6 +125,66 @@ class UtilityManualTrackingSensor(SensorEntity):
         )
         LOGGER.debug("Persisting attributes to storage")
         self._save_attributes()
+
+    def reset_statistics(self) -> None:
+        """Reset the statistics for the sensor."""
+        if len(self._previous_reads) == 0:
+            LOGGER.debug("No previous reads to reset")
+            return
+
+        LOGGER.debug(f"Resetting statistics for {self.entity_id}")
+        reset_statistics(
+            self.hass,
+            self.unique_id,
+            self._algorithm,
+        )
+
+        # Backfill statistics with the previous reads
+        # and the last read value
+        LOGGER.debug(
+            f"Backfilling statistics for {self.entity_id} with algorithm {self._algorithm}"
+        )
+        reads_seen = []
+        for read in self._previous_reads:
+            if len(reads_seen) > 0:
+                missing_data = interpolate(
+                    self._algorithm,
+                    [Datapoint.from_dict(read) for read in reads_seen],
+                    Datapoint.from_dict(read),
+                )
+
+                asyncio.run_coroutine_threadsafe(
+                    backfill_statistics(
+                        self.hass,
+                        self.unique_id,
+                        self._attr_name,
+                        self._attr_native_unit_of_measurement,
+                        self._algorithm,
+                        missing_data,
+                    ),
+                    self.hass.loop,
+                ).result()
+            reads_seen.append(read)
+
+        if len(reads_seen) == 0:
+            return
+
+        missing_data = interpolate(
+            self._algorithm,
+            [Datapoint.from_dict(read) for read in reads_seen],
+            Datapoint(self._last_read_value, self._last_updated),
+        )
+        asyncio.run_coroutine_threadsafe(
+            backfill_statistics(
+                self.hass,
+                self.unique_id,
+                self._attr_name,
+                self._attr_native_unit_of_measurement,
+                self._algorithm,
+                missing_data + [Datapoint(self._last_read_value, self._last_updated)],
+            ),
+            self.hass.loop,
+        ).result()
 
     @property
     def extra_state_attributes(self) -> dict[str, any]:
