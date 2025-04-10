@@ -10,6 +10,7 @@ from homeassistant.components.sensor import SensorEntity, SensorStateClass
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.storage import Store
 
 from custom_components.utility_manual_tracking.algorithms import (
     DEFAULT_ALGORITHM,
@@ -76,6 +77,9 @@ class UtilityManualTrackingSensor(SensorEntity):
         self._last_read_value: float = None
         self._last_updated: datetime | None = None
         self._previous_reads: list[dict[str, float | str]] = []
+        self._store = Store[dict[str, any]](
+            hass, 1, self._attr_unique_id, private=True, atomicWrite=True
+        )
 
         self._load_attributes(hass)
 
@@ -212,10 +216,10 @@ class UtilityManualTrackingSensor(SensorEntity):
 
     def _save_attributes(self) -> None:
         attributes = self.extra_state_attributes
-        self.hass.data[DOMAIN][self.entity_id + "_attributes"] = attributes
+        self._store.async_save(attributes)
 
-    def _load_attributes(self, hass: HomeAssistant) -> None:
-        attributes = hass.data[DOMAIN].get(self.entity_id + "_attributes")
+    def _load_attributes(self) -> None:
+        attributes = self._store.async_load()
         if attributes:
             LOGGER.debug("Loading attributes from storage")
             self._last_updated = attributes.get("last_updated")
