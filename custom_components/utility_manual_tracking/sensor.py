@@ -44,6 +44,7 @@ async def async_setup_entry(
         entry.data[CONF_METER_CLASS],
         entry.data[CONF_ALGORITHM],
     )
+    await sensor._load_attributes()
     hass.data.get(DOMAIN)[sensor.entity_id] = sensor
     LOGGER.info(
         f"Setting up Utility Manual Tracking sensor: {sensor.entity_id} with name {sensor.name}"
@@ -80,8 +81,6 @@ class UtilityManualTrackingSensor(SensorEntity):
         self._store = Store[dict](
             hass, 1, self._attr_unique_id, private=True, atomic_writes=True
         )
-
-        self._load_attributes()
 
     def set_value(self, value, date_utc) -> None:
         """Update the sensor state."""
@@ -216,13 +215,19 @@ class UtilityManualTrackingSensor(SensorEntity):
 
     def _save_attributes(self) -> None:
         attributes = self.extra_state_attributes
-        self._store.async_save(attributes)
+        asyncio.run_coroutine_threadsafe(
+            self._store.async_save(attributes),
+            self.hass.loop,
+        ).result()
+        LOGGER.debug("Saved attributes to storage")
 
-    def _load_attributes(self) -> None:
-        attributes = self._store.async_load()
+    async def _load_attributes(self) -> None:
+        attributes = await self._store.async_load()
         if attributes:
-            LOGGER.debug("Loading attributes from storage")
+            LOGGER.debug("Loaded attributes from storage")
             self._last_updated = attributes.get("last_updated")
             self._last_read_value = attributes.get("last_read")
             self._previous_reads = json.loads(attributes.get("previous_reads"))
             self._algorithm = attributes.get("algorithm")
+        else:
+            LOGGER.debug("No attributes found in storage")
