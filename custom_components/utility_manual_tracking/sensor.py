@@ -77,11 +77,11 @@ class UtilityManualTrackingSensor(SensorEntity):
         self._last_read_value: float = None
         self._last_updated: datetime | None = None
         self._previous_reads: list[dict[str, float | str]] = []
-        self._store = Store[dict[str, any]](
-            hass, 1, self._attr_unique_id, private=True, atomicWrite=True
+        self._store = Store[dict](
+            hass, 1, self._attr_unique_id, private=True, atomic_writes=True
         )
 
-        self._load_attributes(hass)
+        self._load_attributes()
 
     def set_value(self, value, date_utc) -> None:
         """Update the sensor state."""
