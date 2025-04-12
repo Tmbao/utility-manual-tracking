@@ -225,7 +225,7 @@ class UtilityManualTrackingSensor(SensorEntity):
         attributes = await self._store.async_load()
         if attributes:
             LOGGER.debug("Loaded attributes from storage")
-            self._last_updated = attributes.get("last_updated")
+            self._last_updated = datetime.fromisoformat(attributes.get("last_updated"))
             self._last_read_value = attributes.get("last_read")
             self._previous_reads = json.loads(attributes.get("previous_reads"))
             self._algorithm = attributes.get("algorithm")

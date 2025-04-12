@@ -6,9 +6,9 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-import datetime
+from datetime import datetime, timedelta
 
-GRANULAR_DELTA = datetime.timedelta(hours=1)
+GRANULAR_DELTA = timedelta(hours=1)
 
 
 @dataclass(frozen=True)
@@ -16,7 +16,7 @@ class Datapoint:
     """Datapoint class."""
 
     value: float
-    timestamp: datetime.datetime
+    timestamp: datetime
 
     def as_dict(self) -> dict[str, float | str]:
         """Convert to dict."""
@@ -30,7 +30,7 @@ class Datapoint:
         """Convert from dict."""
         return Datapoint(
             value=data["value"],
-            timestamp=datetime.datetime.fromisoformat(data["timestamp"]),
+            timestamp=datetime.fromisoformat(data["timestamp"]),
         )
 
 
@@ -46,7 +46,7 @@ class Interpolate(ABC):
 class Extrapolate(ABC):
     @abstractmethod
     def guesstimate(
-        self, datapoints: list[Datapoint], now: datetime.datetime
+        self, datapoints: list[Datapoint], now: datetime
     ) -> Datapoint:
         """Guess the value of now based on datapoints."""
         pass
