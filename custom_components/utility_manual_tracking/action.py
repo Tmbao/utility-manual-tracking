@@ -4,7 +4,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from homeassistant.core import ServiceCall
-from homeassistant.helpers import service
+from homeassistant.helpers import target
 
 from custom_components.utility_manual_tracking.consts import DOMAIN, LOGGER
 from custom_components.utility_manual_tracking.sensor import (
@@ -16,7 +16,10 @@ DATE_FORMAT = "%Y-%m-%d %H"
 
 
 def handle_update_meter_value(call: ServiceCall):
-    entities = service.async_extract_referenced_entity_ids(call.hass, call)
+    entities = target.async_extract_referenced_entity_ids(
+        call.hass,
+        target.TargetSelection(call.data)
+    )
     value = call.data.get("value")
     read_date_str = call.data.get("date")
     read_date_utc = (
@@ -37,7 +40,10 @@ def handle_update_meter_value(call: ServiceCall):
 
 def handle_reset_meter_statistics(call: ServiceCall):
     """Handle the reset_meter_statistics service call."""
-    entities = service.async_extract_referenced_entity_ids(call.hass, call)
+    entities = target.async_extract_referenced_entity_ids(
+        call.hass,
+        target.TargetSelection(call.data)
+    )
     for sensor_id in entities.referenced:
         sensor = call.hass.data.get(DOMAIN)[sensor_id]
         if isinstance(sensor, UtilityManualTrackingSensor):
